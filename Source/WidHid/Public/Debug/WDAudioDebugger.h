@@ -10,6 +10,8 @@
 
 #include "WDAudioDebugger.generated.h"
 
+class UAkComponent;
+
 UCLASS()
 class WIDHID_API UWDAudioDebugger : public UWorldSubsystem
 {
@@ -23,14 +25,19 @@ protected:
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
+	virtual void OnWorldBeginPlay(UWorld& InWorld) override;
 
 	void Update();
 
 private:
 	FImGuiDelegateHandle ImGuiDelegateHandle;
+	TArray<TWeakObjectPtr<UAkComponent>> AmbientEmitters;
 
 private:
 	void DrawAmbientEmitterDebugger();
+
+	void PopulateAmbientEmitters();
+	
 
 #endif // UE_BUILD_SHIPPING
 };

@@ -1,0 +1,30 @@
+{
+	"FileVersion": 1,
+	"FriendlyName": "Wwise Niagara Integration",
+	"Version": 202413772,
+	"VersionName": "2024.1.7.8863.3772",
+	"CreatedBy": "Audiokinetic, Inc.",
+	"CreatedByURL": "http://audiokinetic.com",
+	"Description": "Wwise Niagara integration",
+	"Category": "Audio",
+	"EnabledByDefault": true,
+	"Modules": [
+		{
+			"Name": "WwiseNiagara",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Niagara",
+			"Enabled": true
+		},
+		{
+			"Name": "Wwise",
+			"Enabled": true
+		}
+	],
+
+	"CanContainContent": true
+}

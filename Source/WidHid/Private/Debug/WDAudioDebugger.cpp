@@ -3,7 +3,10 @@
 #include "Debug/WDAudioDebugger.h"
 
 #if !UE_BUILD_SHIPPING
+#include "AkAmbientSound.h"
+#include "AkComponent.h"
 #include "imgui.h"
+#include "EngineUtils.h"
 
 namespace WDAudioDebugger
 {
@@ -13,6 +16,8 @@ namespace WDAudioDebugger
 
 void UWDAudioDebugger::Initialize(FSubsystemCollectionBase& Collection)
 {
+	Super::Initialize(Collection);
+	
 	FImGuiModule& ImGuiModule = FImGuiModule::Get();
 	ImGuiDelegateHandle = ImGuiModule.AddWorldImGuiDelegate(GetWorld(), FImGuiDelegate::CreateUObject(this, &ThisClass::Update));
 }
@@ -20,6 +25,15 @@ void UWDAudioDebugger::Initialize(FSubsystemCollectionBase& Collection)
 void UWDAudioDebugger::Deinitialize()
 {
 	ImGuiDelegateHandle.Reset();
+
+	Super::Deinitialize();
+}
+
+void UWDAudioDebugger::OnWorldBeginPlay(UWorld& InWorld)
+{
+	Super::OnWorldBeginPlay(InWorld);
+
+	PopulateAmbientEmitters();
 }
 
 void UWDAudioDebugger::Update()
@@ -48,6 +62,17 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 	if (ImGui::CollapsingHeader("Ambient Emitter Debugger"))
 	{
 		ImGui::Text("This debugger has information on emitters currently placed in your scene!");
+	}
+}
+
+void UWDAudioDebugger::PopulateAmbientEmitters()
+{
+	for (TActorIterator<AAkAmbientSound> Itr(GetWorld()); Itr; ++Itr)
+	{
+		if (const AAkAmbientSound* AmbientSound = *Itr)
+		{
+			AmbientEmitters.Add(AmbientSound->AkComponent);
+		}
 	}
 }
 #endif // !UE_BUILD_SHIPPING
