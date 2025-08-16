@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{8E66B9AB-3CC1-40AB-98AF-F765A014327D}" SchemaVersion="123" RootDocumentID="{F6FAC809-EB17-42CD-BD76-E57408BADBA9}" ParentDocumentID="{F6FAC809-EB17-42CD-BD76-E57408BADBA9}">
+	<Events>
+		<WorkUnit Name="AMB" ID="{8E66B9AB-3CC1-40AB-98AF-F765A014327D}" OwnerID="{F6FAC809-EB17-42CD-BD76-E57408BADBA9}" PersistMode="Nested">
+			<PropertyList>
+				<Property Name="Color" Type="int16" Value="9"/>
+				<Property Name="OverrideColor" Type="bool" Value="True"/>
+			</PropertyList>
+			<ChildrenList>
+				<Event Name="play_amb_birds_1" ID="{E06C1A97-5AB5-4AD4-ACB7-D22BC0464D2B}">
+					<ChildrenList>
+						<Action Name="" ID="{AAF11A1D-E00C-414B-815E-BCB5C6DA52DB}" ShortID="208664743">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="amb_birds_1" ID="{7496911A-8C3A-44DA-B9AE-7B3665A849C3}" WorkUnitID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_amb_birds_2" ID="{2090A404-20DB-4169-8F2C-3054C8994D87}">
+					<ChildrenList>
+						<Action Name="" ID="{42D17ACD-3EA0-428B-9F28-2CFE0478AE2C}" ShortID="180151293">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="amb_birds_2" ID="{A610DD29-8839-4232-AAA7-B1D8CCB8D123}" WorkUnitID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_amb_train_movement_on_tracks" ID="{6EA1E588-9A5E-4C37-B2AE-536C9DA00A5B}">
+					<ChildrenList>
+						<Action Name="" ID="{98D0CF7D-A48D-4A4B-B803-874F1817E0CE}" ShortID="566290373">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="amb_train_movement_on_tracks" ID="{C1345A34-1F6A-4E79-B3C8-4FA274166E5D}" WorkUnitID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_amb_train_station_ambience_1" ID="{669190FF-3712-454A-B5B9-D2E338E4252F}">
+					<ChildrenList>
+						<Action Name="" ID="{8047EDCC-F328-42F6-B5A8-049E4EF1E27F}" ShortID="10497260">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="amb_train_station_ambience_1" ID="{10F3048B-C35E-4DE1-8954-8FEAFE65B33C}" WorkUnitID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_amb_train_station_ambience_2" ID="{0F331372-D32D-4705-84A5-EA20B8717291}">
+					<ChildrenList>
+						<Action Name="" ID="{EF705036-3F38-4F3D-AA3A-0D3E1C3472C6}" ShortID="958374746">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="amb_train_station_ambience_2" ID="{02542EEB-E300-4EBA-A219-AD071F81AA4A}" WorkUnitID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>

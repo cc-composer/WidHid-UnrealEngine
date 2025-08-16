@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}" SchemaVersion="123" RootDocumentID="{6C16C410-68C1-4F34-AB87-72AA04C31CDB}" ParentDocumentID="{6C16C410-68C1-4F34-AB87-72AA04C31CDB}">
+	<AudioObjects>
+		<WorkUnit Name="AMB" ID="{049C07A6-AF8F-48B7-99E7-A626DBC6C775}" OwnerID="{6C16C410-68C1-4F34-AB87-72AA04C31CDB}" PersistMode="Nested">
+			<PropertyList>
+				<Property Name="Color" Type="int16" Value="9"/>
+				<Property Name="OverrideColor" Type="bool" Value="True"/>
+			</PropertyList>
+			<ChildrenList>
+				<ActorMixer Name="AMB" ID="{DB20DAB0-0689-4426-AA8C-265494B5558E}" ShortID="79699378">
+					<PropertyList>
+						<Property Name="3DSpatialization" Type="int16" Value="2"/>
+						<Property Name="BelowThresholdBehavior" Type="int16" Value="3"/>
+						<Property Name="IsGlobalLimit" Type="int16" Value="1"/>
+						<Property Name="MaxSoundPerInstance" Type="int16">
+							<ValueList>
+								<Value>20</Value>
+							</ValueList>
+						</Property>
+						<Property Name="OverLimitBehavior" Type="int16" Value="1"/>
+						<Property Name="Priority" Type="int16">
+							<ValueList>
+								<Value>30</Value>
+							</ValueList>
+						</Property>
+						<Property Name="PriorityDistanceFactor" Type="bool" Value="True"/>
+						<Property Name="PriorityDistanceOffset" Type="int16">
+							<ValueList>
+								<Value>-30</Value>
+							</ValueList>
+						</Property>
+						<Property Name="UseMaxSoundPerInstance" Type="bool">
+							<ValueList>
+								<Value>True</Value>
+							</ValueList>
+						</Property>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Attenuation">
+							<ObjectRef Name="att_amb_5000_lpf30" ID="{11A10387-463C-440B-95B2-DF133EC9598F}" WorkUnitID="{80397044-6609-410F-A7EC-77C8DC5BD3C9}"/>
+						</Reference>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="AMB" ID="{DE689330-496B-406F-92AE-2D4F05B618D9}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Folder Name="Birds" ID="{1A767D2D-CE20-47A6-8AA6-AF0CE4190EF9}" ShortID="336262492">
+							<ChildrenList>
+								<Sound Name="amb_birds_1" ID="{7496911A-8C3A-44DA-B9AE-7B3665A849C3}" ShortID="339508853">
+									<PropertyList>
+										<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+										<Property Name="IsStreamingEnabled" Type="bool">
+											<ValueList>
+												<Value>True</Value>
+											</ValueList>
+										</Property>
+									</PropertyList>
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="birds_1" ID="{F9D55268-9845-46F0-8AFD-D8EFA76C72B6}">
+											<PropertyList>
+												<Property Name="CrossfadeDuration" Type="Real64" Value="500"/>
+												<Property Name="FadeInDuration" Type="Real64" Value="0.3"/>
+												<Property Name="LoopBegin" Type="Real64" Value="0.5"/>
+												<Property Name="LoopEnd" Type="Real64" Value="47"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+											</PropertyList>
+											<Language>SFX</Language>
+											<AudioFile>Ambience\Birds\birds_1.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="416385870"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="birds_1" ID="{F9D55268-9845-46F0-8AFD-D8EFA76C72B6}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="amb_birds_2" ID="{A610DD29-8839-4232-AAA7-B1D8CCB8D123}" ShortID="911816365">
+									<PropertyList>
+										<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+										<Property Name="IsStreamingEnabled" Type="bool">
+											<ValueList>
+												<Value>True</Value>
+											</ValueList>
+										</Property>
+									</PropertyList>
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="birds_2" ID="{D194F823-DDB8-43EE-90E3-0E5BACAAE648}">
+											<PropertyList>
+												<Property Name="CrossfadeDuration" Type="Real64" Value="1000"/>
+												<Property Name="FadeInDuration" Type="Real64" Value="1"/>
+												<Property Name="LoopBegin" Type="Real64" Value="3"/>
+												<Property Name="LoopEnd" Type="Real64" Value="80"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+												<Property Name="TrimBegin" Type="Real64" Value="2.15"/>
+											</PropertyList>
+											<Language>SFX</Language>
+											<AudioFile>Ambience\Birds\birds_2.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="84190447"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="birds_2" ID="{D194F823-DDB8-43EE-90E3-0E5BACAAE648}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+							</ChildrenList>
+						</Folder>
+						<Folder Name="Train" ID="{68E0A129-D157-4269-B91A-FDACB844A2B5}" ShortID="256668211">
+							<ChildrenList>
+								<Sound Name="amb_train_station_ambience_1" ID="{10F3048B-C35E-4DE1-8954-8FEAFE65B33C}" ShortID="577631524">
+									<PropertyList>
+										<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+										<Property Name="IsStreamingEnabled" Type="bool">
+											<ValueList>
+												<Value>True</Value>
+											</ValueList>
+										</Property>
+									</PropertyList>
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="train_1" ID="{39C7E127-ABD7-4696-AFD1-091E2ABB603B}">
+											<PropertyList>
+												<Property Name="CrossfadeDuration" Type="Real64" Value="1500"/>
+												<Property Name="FadeInDuration" Type="Real64" Value="2"/>
+												<Property Name="LoopBegin" Type="Real64" Value="8.6"/>
+												<Property Name="LoopEnd" Type="Real64" Value="60"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+											</PropertyList>
+											<Language>SFX</Language>
+											<AudioFile>Ambience\Train\train_1.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="1037478089"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="train_1" ID="{39C7E127-ABD7-4696-AFD1-091E2ABB603B}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="amb_train_movement_on_tracks" ID="{C1345A34-1F6A-4E79-B3C8-4FA274166E5D}" ShortID="426356824">
+									<PropertyList>
+										<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+										<Property Name="IsStreamingEnabled" Type="bool">
+											<ValueList>
+												<Value>True</Value>
+											</ValueList>
+										</Property>
+									</PropertyList>
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="train_2" ID="{63944D32-7F5C-437E-9E37-6F2E0E1421D2}">
+											<PropertyList>
+												<Property Name="CrossfadeDuration" Type="Real64" Value="1000"/>
+												<Property Name="FadeInDuration" Type="Real64" Value="1.5"/>
+												<Property Name="LoopBegin" Type="Real64" Value="5.5"/>
+												<Property Name="LoopEnd" Type="Real64" Value="28.75"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+												<Property Name="VolumeOffset" Type="Real64">
+													<ValueList>
+														<Value>-5</Value>
+													</ValueList>
+												</Property>
+											</PropertyList>
+											<Language>SFX</Language>
+											<AudioFile>Ambience\Train\train_2.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="1029050603"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="train_2" ID="{63944D32-7F5C-437E-9E37-6F2E0E1421D2}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="amb_train_station_ambience_2" ID="{02542EEB-E300-4EBA-A219-AD071F81AA4A}" ShortID="52384522">
+									<PropertyList>
+										<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+										<Property Name="IsStreamingEnabled" Type="bool">
+											<ValueList>
+												<Value>True</Value>
+											</ValueList>
+										</Property>
+									</PropertyList>
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="trainstation_articulatedsound" ID="{A2332331-9BCE-4058-B6D7-9A82E5C8DA32}">
+											<PropertyList>
+												<Property Name="CrossfadeDuration" Type="Real64" Value="1500"/>
+												<Property Name="FadeInDuration" Type="Real64" Value="2"/>
+												<Property Name="LoopBegin" Type="Real64" Value="3"/>
+												<Property Name="LoopEnd" Type="Real64" Value="124"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+											</PropertyList>
+											<Language>SFX</Language>
+											<AudioFile>Ambience\Train\trainstation_articulatedsound.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="952303702"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="trainstation_articulatedsound" ID="{A2332331-9BCE-4058-B6D7-9A82E5C8DA32}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+							</ChildrenList>
+						</Folder>
+					</ChildrenList>
+				</ActorMixer>
+			</ChildrenList>
+		</WorkUnit>
+	</AudioObjects>
+</WwiseDocument>

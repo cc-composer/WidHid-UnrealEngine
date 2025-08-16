@@ -9,6 +9,19 @@
 							<ObjectRef Name="System" ID="{A9B20FE6-C8F6-4D50-AF4D-A44134ACC5BD}" WorkUnitID="{1BD96803-4DFD-4D1F-9832-0F2126B1D010}"/>
 						</Reference>
 					</ReferenceList>
+					<ChildrenList>
+						<Bus Name="AMB" ID="{DE689330-496B-406F-92AE-2D4F05B618D9}">
+							<PropertyList>
+								<Property Name="BusChannelConfig" Type="int32">
+									<ValueList>
+										<Value>3584</Value>
+									</ValueList>
+								</Property>
+								<Property Name="Color" Type="int16" Value="9"/>
+								<Property Name="OverrideColor" Type="bool" Value="True"/>
+							</PropertyList>
+						</Bus>
+					</ChildrenList>
 				</Bus>
 			</ChildrenList>
 		</WorkUnit>
