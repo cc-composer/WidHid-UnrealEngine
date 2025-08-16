@@ -75,6 +75,11 @@ void UWDAudioDebugger::Update()
 		
 		if (ImGui::Begin("Audio Debugger", &bIsWindowOpen))
 		{
+			// Might not keep this since this will flush debug shapes outside of this debugger too, but it works for now.
+			UWorld* World = GetWorld();
+			FlushDebugStrings(World);
+			FlushPersistentDebugLines(World);
+			
 			DrawAmbientEmitterDebugger();
 			ImGui::End();
 		}
@@ -103,7 +108,7 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 				// Draw a sphere at the location of the emitter, shifting it from red to green as the listener gets closer to it.
 				const UWorld* World = GetWorld();
 				const FVector Location = Emitter->GetComponentLocation();
-				constexpr float Radius = 5.0f;
+				constexpr float Radius = 10.0f;
 				constexpr int32 Segments = 5;
 				const FColor Color = WDAudioDebugger::GetEmitterDistanceColor(Emitter, Emitter->AkAudioEvent->MaxAttenuationRadius);
 				constexpr bool bPersistentLines = true;
