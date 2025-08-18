@@ -14,6 +14,23 @@ namespace WDAudioDebugger
 	constexpr bool bAudioDebuggerVisible = false;
 	static TAutoConsoleVariable<bool> CVarAudioDebuggerVisible(TEXT("wd.AudioDebuggerVisible"), bAudioDebuggerVisible, TEXT("(Visible = 1; Not Visible = 0) Show window with various audio debug functionality and information."));
 
+	float GetDistanceFromListener(const FVector& Location)
+	{
+		const FAkAudioDevice* AudioDevice = FAkAudioDevice::Get();
+		if (!AudioDevice)
+		{
+			return 0.0f;
+		}
+
+		const UAkComponent* Listener = AudioDevice->GetSpatialAudioListener();
+		if (!Listener)
+		{
+			return 0.0f;
+		}
+
+		return FVector::Distance(Location, Listener->GetComponentLocation());
+	}
+	
 	FColor GetEmitterDistanceColor(const UAkComponent* Emitter, const int SoundMaxAttenuation)
 	{
 		// Sounds with no attenuation (2D sounds) can't be tracked in physical space.
@@ -24,23 +41,20 @@ namespace WDAudioDebugger
 			return FColor::Black;
 		}
 		
-		const FAkAudioDevice* AudioDevice = FAkAudioDevice::Get();
-		if (!AudioDevice)
-		{
-			return FColor::Black;
-		}
-
-		const UAkComponent* Listener = AudioDevice->GetSpatialAudioListener();
-		if (!Listener)
-		{
-			return FColor::Black;
-		}
-
-		const int DistanceFromListener = FVector::Distance(Emitter->GetComponentLocation(), Listener->GetComponentLocation());
-		const float PercentageOfAttenuation = static_cast<float>(DistanceFromListener) / static_cast<float>(SoundMaxAttenuation);
+		const float PercentageOfAttenuation = GetDistanceFromListener(Emitter->GetComponentLocation() / static_cast<float>(SoundMaxAttenuation));
 
 		// A gradual gradient from red to green as the listener gets closer to the emitter's center.
 		return FColor::MakeRedToGreenColorFromScalar(1.0f - PercentageOfAttenuation);
+	}
+
+	bool InAudibleRange(const FVector& TargetLocation, const UAkAudioEvent* Sound)
+	{
+		if (!Sound)
+		{
+			return false;
+		}
+
+		return GetDistanceFromListener(TargetLocation) <= Sound->MaxAttenuationRadius;
 	}
 }
 
@@ -96,32 +110,52 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 {
 	if (ImGui::CollapsingHeader("Ambient Emitter Debugger"))
 	{
-		// TODO: Ambient emitters should be refreshed every so often since they could be spawning/despawning from the world.
+		// Ambient emitters should be refreshed every so often since they could be spawning/despawning from the world.
+		const UWorld* World = GetWorld();
+		const double CurrentTime = World->GetTimeSeconds();
+		if (CurrentTime - LastTimeAmbientEmittersRefreshed >= AmbientEmitterRefreshRate)
+		{
+			PopulateAmbientEmitters();
+		}
+		
 		for (auto Itr = AmbientEmitters.CreateIterator(); ++Itr; Itr)
 		{
-			// TODO: Maybe display emitters that don't have sounds on them so they're easily known and can be fixed.
 			const UAkComponent* Emitter = Itr->Get();
-			if (Emitter && Emitter->AkAudioEvent)
+			if (Emitter)
 			{
-				// TODO: Only display debug objects and details for sounds that are actually within audible range.
-				
-				// Draw a sphere at the location of the emitter, shifting it from red to green as the listener gets closer to it.
-				const UWorld* World = GetWorld();
-				const FVector Location = Emitter->GetComponentLocation();
-				constexpr float Radius = 10.0f;
-				constexpr int32 Segments = 5;
-				const FColor Color = WDAudioDebugger::GetEmitterDistanceColor(Emitter, Emitter->AkAudioEvent->MaxAttenuationRadius);
-				constexpr bool bPersistentLines = true;
-				DrawDebugSphere(World, Location, Radius, Segments, Color, bPersistentLines);
+				if (Emitter->AkAudioEvent)
+				{
+					// Only display debug objects and details for sounds that are actually within audible range.
+					if (!WDAudioDebugger::InAudibleRange(Emitter->GetComponentLocation(), Emitter->AkAudioEvent))
+					{
+						continue;
+					}
 
-				// Display the emitter's name underneath the sphere.
-				const FString Text = Emitter->GetOwner()->GetActorNameOrLabel();
-				const FVector TextOffset = FVector(0.0f, 0.0f, 10.0f);
-				DrawDebugString(World, Location - TextOffset, Text, nullptr, Color);
+					// Draw a sphere at the location of the emitter, shifting it from red to green as the listener gets closer to it.
+					const FVector Location = Emitter->GetComponentLocation();
+					constexpr float Radius = 10.0f;
+					constexpr int32 Segments = 5;
+					const FColor Color = WDAudioDebugger::GetEmitterDistanceColor(Emitter, Emitter->AkAudioEvent->MaxAttenuationRadius);
+					constexpr bool bPersistentLines = true;
+					DrawDebugSphere(World, Location, Radius, Segments, Color, bPersistentLines);
+
+					// Display the emitter's name underneath the sphere.
+					const FString Text = Emitter->GetOwner()->GetActorNameOrLabel();
+					const FVector TextOffset = FVector(0.0f, 0.0f, 10.0f);
+					DrawDebugString(World, Location - TextOffset, Text, nullptr, Color);
+				}
+				else // if (!Emitter->AkAudioEvent)
+				{
+					const AActor* Owner = Emitter->GetOwner();
+					const FString Name = Owner ? Owner->GetActorNameOrLabel() : Emitter->GetName();
+					const ImVec4 Color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+
+					ImGui::TextColored(Color, "%s does not have an event associated to it. No sound is being played.", *Name);
+				}
 			}
-			else
+			else // if (!Emitter)
 			{
-				// This emitter is no longer existent/valid, or doesn't have a sound.
+				// This emitter is no longer existent/valid.
 				Itr.RemoveCurrent();
 				continue;
 			}
@@ -131,12 +165,24 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 
 void UWDAudioDebugger::PopulateAmbientEmitters()
 {
-	for (TActorIterator<AAkAmbientSound> Itr(GetWorld()); Itr; ++Itr)
+	// Empty the array, but keep the slack. It's to be expected that at least a grand majority of the elements being emptied will be refilled.
+	// Especially since we're already consistently doing cleanup in DrawAmbientEmitterDebugger().
+	AmbientEmitters.Empty(AmbientEmitters.GetSlack());
+	
+	const UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+	
+	for (TActorIterator<AAkAmbientSound> Itr(World); Itr; ++Itr)
 	{
 		if (const AAkAmbientSound* AmbientSound = *Itr)
 		{
 			AmbientEmitters.Add(AmbientSound->AkComponent);
 		}
 	}
+
+	LastTimeAmbientEmittersRefreshed = World->GetTimeSeconds();
 }
 #endif // !UE_BUILD_SHIPPING

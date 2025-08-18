@@ -31,8 +31,14 @@ public:
 
 private:
 	FImGuiDelegateHandle ImGuiDelegateHandle;
+	
 	TArray<TWeakObjectPtr<UAkComponent>> AmbientEmitters;
 
+	// How often, in seconds, should we update the emitters (AkAmbientSounds) in the world.
+	// This does use an actor iterator for all AkAmbientSounds, so this is a potentially slow operation if a lot of actors are in the world.
+	double AmbientEmitterRefreshRate = 5.0;
+	double LastTimeAmbientEmittersRefreshed = 0.0; // Tracked by the world's GetTimeSeconds().
+	
 private:
 	void DrawAmbientEmitterDebugger();
 
