@@ -20,6 +20,24 @@
 								<Property Name="Color" Type="int16" Value="9"/>
 								<Property Name="OverrideColor" Type="bool" Value="True"/>
 							</PropertyList>
+							<StateInfo>
+								<StateGroupList>
+									<StateGroupInfo>
+										<StateGroupRef Name="Ambience" ID="{1DBDC0E3-81CF-41E1-A301-6023646D0C5C}"/>
+									</StateGroupInfo>
+								</StateGroupList>
+								<CustomStateList>
+									<CustomState>
+										<StateRef Name="Muted" ID="{6459CD3C-46A2-4F82-83BF-F19A1F895756}"/>
+										<CustomState Name="" ID="{60C8B1D4-F218-44B7-BDD0-BE2024DCD13B}" ShortID="864285557">
+											<PropertyList>
+												<Property Name="BusVolume" Type="Real64" Value="-108"/>
+												<Property Name="Volume" Type="Real64" Value="-108"/>
+											</PropertyList>
+										</CustomState>
+									</CustomState>
+								</CustomStateList>
+							</StateInfo>
 						</Bus>
 					</ChildrenList>
 				</Bus>

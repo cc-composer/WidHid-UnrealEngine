@@ -8,6 +8,6 @@ public class WidHid : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "ImGui", "AkAudio", "WwiseSoundEngine" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "DeveloperSettings", "Engine", "InputCore", "EnhancedInput", "ImGui", "AkAudio", "WwiseSoundEngine" });
 	}
 }

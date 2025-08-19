@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{98B9B0B5-186C-4411-A5B9-A1531BD5505F}" SchemaVersion="123" RootDocumentID="{766CC959-9198-4FA1-A5A1-583B5AF5F552}" ParentDocumentID="{766CC959-9198-4FA1-A5A1-583B5AF5F552}">
+	<States>
+		<WorkUnit Name="Debug" ID="{98B9B0B5-186C-4411-A5B9-A1531BD5505F}" OwnerID="{766CC959-9198-4FA1-A5A1-583B5AF5F552}" PersistMode="Nested">
+			<ChildrenList>
+				<StateGroup Name="Ambience" ID="{1DBDC0E3-81CF-41E1-A301-6023646D0C5C}">
+					<ChildrenList>
+						<State Name="None" ID="{49A87DB7-6FBE-4894-A813-0E62DF470EC9}"/>
+						<State Name="Muted" ID="{6459CD3C-46A2-4F82-83BF-F19A1F895756}"/>
+					</ChildrenList>
+				</StateGroup>
+				<StateGroup Name="UI" ID="{805824BD-37BB-4F1D-AA8C-9688DCA0DDD7}">
+					<ChildrenList>
+						<State Name="None" ID="{2CF4A5F5-04B1-4E4D-A64D-5995399398C6}"/>
+						<State Name="Muted" ID="{7330B735-048F-42CF-813B-A32817F77621}"/>
+					</ChildrenList>
+				</StateGroup>
+				<StateGroup Name="Music" ID="{50706F42-A89A-455E-A1F9-4D9569F0D609}">
+					<ChildrenList>
+						<State Name="None" ID="{56E10B60-8800-48E6-9972-CAB820EC684E}"/>
+						<State Name="Muted" ID="{A572F9FD-E7E0-4B9C-AEB4-B1DDB262ED63}"/>
+					</ChildrenList>
+				</StateGroup>
+				<StateGroup Name="Reverb" ID="{079437A0-3C7E-4CCC-B208-7C00C705956A}">
+					<ChildrenList>
+						<State Name="None" ID="{A19AC81C-49F0-4AE7-BC96-D6B39FF1F152}"/>
+						<State Name="Muted" ID="{034782AE-31AB-460A-B65C-E61A4EE20F62}"/>
+					</ChildrenList>
+				</StateGroup>
+			</ChildrenList>
+		</WorkUnit>
+	</States>
+</WwiseDocument>

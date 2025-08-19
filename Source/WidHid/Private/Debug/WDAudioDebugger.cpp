@@ -6,8 +6,11 @@
 #include "AkAmbientSound.h"
 #include "AkAudioEvent.h"
 #include "AkComponent.h"
+#include "AkGameplayStatics.h"
+#include "AkStateValue.h"
 #include "EngineUtils.h"
 #include "imgui.h"
+#include "Utils/WDAudioConfig.h"
 #include "Wwise/API/WwiseSoundEngineAPI.h"
 #include "Wwise/API/WwiseSpatialAudioAPI.h"
 
@@ -80,6 +83,11 @@ void UWDAudioDebugger::OnWorldBeginPlay(UWorld& InWorld)
 	Super::OnWorldBeginPlay(InWorld);
 
 	PopulateAmbientEmitters();
+
+	if (const UWDAudioConfig* Config = GetDefault<UWDAudioConfig>())
+	{
+		MixStates = Config->MixStates;
+	}
 }
 
 void UWDAudioDebugger::Update()
@@ -97,6 +105,7 @@ void UWDAudioDebugger::Update()
 			FlushPersistentDebugLines(World);
 			
 			DrawAmbientEmitterDebugger();
+			DrawMixStates();
 			ImGui::End();
 		}
 
@@ -247,6 +256,116 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 		}
 
 		ImGui::EndTable();
+	}
+}
+
+void UWDAudioDebugger::DrawMixStates()
+{
+	if (ImGui::CollapsingHeader("Mix States"))
+	{
+		for (FWDAudioDebugMixState& MixState : MixStates)
+		{
+			if (const UAkStateValue* MuteState = MixState.MuteState)
+			{
+				FString GroupName = FString();
+				FString ValueName = FString();
+				const float Spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+
+				// The full state name should be [Category]-Muted
+				// For example, Ambience-Muted, which will give us a group name of Ambience.
+				MuteState->SplitAssetName(GroupName, ValueName);
+
+				if (ImGui::BeginTable("Mix States", /* Columns */ 3, /* Flags */ 0, /* Outer Size */ ImVec2(220.0f, 0.0f)))
+				{
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+					
+					ImGui::Text(TCHAR_TO_ANSI(*GroupName));
+
+					ImGui::TableNextColumn();
+
+					// ImGui uses strings as IDs when identifying UI elements. If we wrote "Solo" for all checkboxes, then selecting one of those checkboxes will check them all simultaneously.
+					// Everything after the ## will not show up in the actual UI text, BUT it will still augment the ID so we can still have multiple checkboxes with the same label.
+					const FString SoloLabel = FString::Printf(TEXT("Solo##%s"), *GroupName);
+					if (ImGui::Checkbox(TCHAR_TO_ANSI(*SoloLabel), &MixState.bSoloed))
+					{
+						PostSoloed(MixState);
+					}
+
+					ImGui::TableNextColumn();
+
+					const FString MuteLabel = FString::Printf(TEXT("Mute##%s"), *GroupName);
+					if (ImGui::Checkbox(TCHAR_TO_ANSI(*MuteLabel), &MixState.bMuted))
+					{
+						PostMuted(MixState);
+					}
+
+					ImGui::EndTable();
+				}
+			}
+		}
+	}
+}
+
+void UWDAudioDebugger::PostSoloed(FWDAudioDebugMixState& MixState)
+{
+	if (MixState.bSoloed)
+	{
+		// Can't be simultaneously muted and soloed.
+		MixState.bMuted = false;
+
+		UAkGameplayStatics::SetState(MixState.NeutralState);
+	}
+
+	bool bAnotherStateSoloed = false;
+
+	// If this state was just soloed, all other non-soloed states should be muted.
+	// Otherwise, all other states should be unmuted.
+	for (FWDAudioDebugMixState& OtherMixState : MixStates)
+	{
+		if (MixState.MuteState == OtherMixState.MuteState)
+		{
+			continue;
+		}
+
+		if (OtherMixState.bSoloed)
+		{
+			bAnotherStateSoloed = true;
+		}
+
+		OtherMixState.bMuted = MixState.bSoloed;
+
+		const UAkStateValue* StateToSet = MixState.bSoloed ? OtherMixState.MuteState : OtherMixState.NeutralState;
+		UAkGameplayStatics::SetState(StateToSet);
+	}
+
+	if (!MixState.bSoloed && bAnotherStateSoloed)
+	{
+		// When unsoloing a mix state, it should be muted if another state is currently soloed.
+		UAkGameplayStatics::SetState(MixState.MuteState);
+	}
+}
+
+void UWDAudioDebugger::PostMuted(FWDAudioDebugMixState& MixState)
+{
+	const UAkStateValue* StateToSet = MixState.bMuted ? MixState.MuteState : MixState.NeutralState;
+	UAkGameplayStatics::SetState(StateToSet);
+
+	// If this state was soloed, unsolo it and unmute all other states.
+	if (MixState.bMuted && MixState.bSoloed)
+	{
+		MixState.bSoloed = false;
+
+		for (FWDAudioDebugMixState& OtherMixState : MixStates)
+		{
+			if (MixState.MuteState == OtherMixState.MuteState)
+			{
+				continue;
+			}
+
+			OtherMixState.bMuted = false;
+			UAkGameplayStatics::SetState(OtherMixState.NeutralState);
+		}
 	}
 }
 
