@@ -44,6 +44,7 @@ class AKAUDIO_API UAkAudioEvent : public UAkAudioType
 	GENERATED_BODY()
 
 // WIDHID CUSTOM - BEGIN
+public:
 	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEventPosted, UAkAudioEvent*, UAkGameObject*);
 // WIDHID CUSTOM - END
 	//
