@@ -66,6 +66,10 @@ private:
 	void PostMuted(FWDAudioDebugMixState& MixState);
 	void PostSoloed(FWDAudioDebugMixState& MixState);
 
+private:
+	// Character Animation Debugger
+	void DrawCharacterAnimationDebugger();
+
 #endif // UE_BUILD_SHIPPING
 
 	// This must be placed outside of UE_BUILD_SHIPPING.

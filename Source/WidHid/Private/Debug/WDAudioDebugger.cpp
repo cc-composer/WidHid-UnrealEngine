@@ -8,9 +8,13 @@
 #include "AkComponent.h"
 #include "AkGameplayStatics.h"
 #include "AkStateValue.h"
+#include "Animation/AnimInstanceProxy.h"
+#include "Animation/AnimMontage.h"
+#include "GameFramework/Character.h"
 #include "EngineUtils.h"
 #include "imgui.h"
 #include "Utils/WDAudioConfig.h"
+#include "Utils/WDAudioStatics.h"
 #include "Wwise/API/WwiseSoundEngineAPI.h"
 #include "Wwise/API/WwiseSpatialAudioAPI.h"
 
@@ -101,11 +105,15 @@ void UWDAudioDebugger::Update()
 		{
 			// Might not keep this since this will flush debug shapes outside of this debugger too, but it works for now.
 			UWorld* World = GetWorld();
+#if ENABLE_DRAW_DEBUG
 			FlushDebugStrings(World);
 			FlushPersistentDebugLines(World);
+#endif
 			
 			DrawAmbientEmitterDebugger();
 			DrawMixStates();
+			DrawCharacterAnimationDebugger();
+
 			ImGui::End();
 		}
 
@@ -169,6 +177,7 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 				continue;
 			}
 
+#if ENABLE_DRAW_DEBUG
 			// Draw a sphere at the location of the emitter, shifting it from red to green as the listener gets closer to it.
 			const FVector Location = Emitter->GetComponentLocation();
 			constexpr float Radius = 10.0f;
@@ -181,6 +190,7 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 			const FString Text = Emitter->GetOwner()->GetActorNameOrLabel();
 			const FVector TextOffset = FVector(0.0f, 0.0f, 10.0f);
 			DrawDebugString(World, Location - TextOffset, Text, nullptr, Color);
+#endif
 
 			// Sound Name
 			ImGui::Text("%s", TCHAR_TO_ANSI(*Text));
@@ -269,7 +279,6 @@ void UWDAudioDebugger::DrawMixStates()
 			{
 				FString GroupName = FString();
 				FString ValueName = FString();
-				const float Spacing = ImGui::GetStyle().ItemInnerSpacing.x;
 
 				// The full state name should be [Category]-Muted
 				// For example, Ambience-Muted, which will give us a group name of Ambience.
@@ -365,6 +374,105 @@ void UWDAudioDebugger::PostMuted(FWDAudioDebugMixState& MixState)
 
 			OtherMixState.bMuted = false;
 			UAkGameplayStatics::SetState(OtherMixState.NeutralState);
+		}
+	}
+}
+
+void UWDAudioDebugger::DrawCharacterAnimationDebugger()
+{
+	// This isn't specific to audio, so can be used in a more general debugger, but it is very useful for systems that use a lot of audio animation notifies. 
+	// Heavily simplifies the process of figuring out which animations are currently playing.
+	if (ImGui::CollapsingHeader("Character Animation Debugger"))
+	{
+		// This currently only tracks the animations of the local pawn, but this method can done with anything that has a skeletal mesh you have access to.
+		if (ImGui::BeginTable("Current Local Animations", /* Columns */ 3))
+		{
+			ImGui::TableSetupColumn("Animation Instance");
+			ImGui::TableSetupColumn("Animation");
+			ImGui::TableSetupColumn("Weight");
+			ImGui::TableHeadersRow();
+
+			if (const ACharacter* LocalCharacter = UWDAudioStatics::GetLocallyViewedPawn(this))
+			{
+				if (const USkeletalMeshComponent* Mesh = LocalCharacter->GetMesh())
+				{
+					if (UAnimInstance* AnimInstance = Mesh->GetAnimInstance())
+					{
+						const FAnimInstanceProxy::FSyncGroupMap& SyncGroupMap = AnimInstance->GetSyncGroupMapRead();
+						const TArray<FAnimTickRecord>& UngroupedActivePlayers = AnimInstance->GetUngroupedActivePlayersRead();
+
+						// Animations from an active blendspace.
+						const ANSICHAR* AnimInstanceName = TCHAR_TO_ANSI(*AnimInstance->GetName());
+						for (const TTuple<FName, FAnimGroupInstance>& SyncGroupPair : SyncGroupMap)
+						{
+							for (const FAnimTickRecord& Record : SyncGroupPair.Value.ActivePlayers)
+							{
+								if (!Record.bIsExclusiveLeader && Record.EffectiveBlendWeight > 0.0f)
+								{
+									ImGui::TableNextRow();
+									ImGui::TableNextColumn();
+
+									// Animation Instance
+									ImGui::Text(AnimInstanceName);
+									ImGui::TableNextColumn();
+
+									// Animation
+									ImGui::Text(TCHAR_TO_ANSI(*Record.SourceAsset->GetName()));
+									ImGui::TableNextColumn();
+
+									// Weight
+									ImGui::Text("%f", Record.EffectiveBlendWeight * 100.0f);
+								}
+							}
+						}
+
+						// Individual animations
+						for (const FAnimTickRecord& Record : UngroupedActivePlayers)
+						{
+							if (Record.EffectiveBlendWeight > 0.0f)
+							{
+								ImGui::TableNextRow();
+								ImGui::TableNextColumn();
+
+								// Animation Instance
+								ImGui::Text(AnimInstanceName);
+								ImGui::TableNextColumn();
+
+								// Animation
+								ImGui::Text(TCHAR_TO_ANSI(*Record.SourceAsset->GetName()));
+								ImGui::TableNextColumn();
+
+								// Weight
+								ImGui::Text("%f", Record.EffectiveBlendWeight * 100.0f);
+							}
+						}
+
+						// Basic animation montages
+						for (const FAnimMontageInstance* MontageInstance : AnimInstance->MontageInstances)
+						{
+							if (MontageInstance && MontageInstance->Montage)
+							{
+								ImGui::TableNextRow();
+								ImGui::TableNextColumn();
+
+								// Animation Instance
+								ImGui::Text(AnimInstanceName);
+								ImGui::TableNextColumn();
+
+								// Animation
+								ImGui::Text(TCHAR_TO_ANSI(*MontageInstance->Montage->GetName()));
+								ImGui::TableNextColumn();
+
+								// Weight
+								ImGui::Text("%f", MontageInstance->GetWeight() * 100.0f);
+							}
+						}
+					}
+				}
+
+			}
+
+			ImGui::EndTable();
 		}
 	}
 }
