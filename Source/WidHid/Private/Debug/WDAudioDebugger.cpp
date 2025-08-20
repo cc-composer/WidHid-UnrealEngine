@@ -78,6 +78,7 @@ void UWDAudioDebugger::Initialize(FSubsystemCollectionBase& Collection)
 void UWDAudioDebugger::Deinitialize()
 {
 	ImGuiDelegateHandle.Reset();
+	UAkAudioEvent::OnEventPosted.RemoveAll(this);
 
 	Super::Deinitialize();
 }
@@ -92,6 +93,8 @@ void UWDAudioDebugger::OnWorldBeginPlay(UWorld& InWorld)
 	{
 		MixStates = Config->MixStates;
 	}
+
+	UAkAudioEvent::OnEventPosted.AddUObject(this, &ThisClass::EventPosted);
 }
 
 void UWDAudioDebugger::Update()
@@ -110,6 +113,7 @@ void UWDAudioDebugger::Update()
 			FlushPersistentDebugLines(World);
 #endif
 			
+			DrawRecentlyPostedEvents();
 			DrawAmbientEmitterDebugger();
 			DrawMixStates();
 			DrawCharacterAnimationDebugger();
@@ -474,6 +478,73 @@ void UWDAudioDebugger::DrawCharacterAnimationDebugger()
 
 			ImGui::EndTable();
 		}
+	}
+}
+
+void UWDAudioDebugger::DrawRecentlyPostedEvents()
+{
+	if (!bDisplayingEventWindow)
+	{
+		ImGui::Selectable("Show Recently Posted Events", &bDisplayingEventWindow);
+	}
+	else
+	{
+		ImGui::Selectable("Hide Event Window", &bDisplayingEventWindow);
+		if (ImGui::Begin("Event Window", &bDisplayingEventWindow, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			if (ImGui::BeginTable("Last 100 Events", /* Columns */ 3))
+			{
+				ImGui::TableSetupColumn("World Time Posted");
+				ImGui::TableSetupColumn("Event Name");
+				ImGui::TableSetupColumn("Game Object Name");
+				ImGui::TableHeadersRow();
+
+				for (const FWDAudioDebugEventInformation& PostedEvent : Last100PostedEvents)
+				{
+					ImGui::TableNextRow();
+					ImGui::TableNextColumn();
+
+					// World Time Posted
+					ImGui::Text("%f", PostedEvent.WorldTimePosted);
+					ImGui::TableNextColumn();
+
+					// Event - Colored red if the event is invalid.
+					const UAkAudioEvent* Event = PostedEvent.Event;
+					const FString EventName = Event ? Event->GetName() : "Invalid Event";
+					const ImVec4 EventColor = Event ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+					ImGui::TextColored(EventColor, TCHAR_TO_ANSI(*EventName));
+					ImGui::TableNextColumn();
+
+					// Game Object (UAkComponent) - Colored red if the event AND game object is invalid.
+					const UAkGameObject* GameObject = PostedEvent.GameObject;
+					FString GameObjectName = Event ? EventName : "Invalid Game Object";
+					if (GameObject)
+					{
+						GameObjectName = GameObject->GetOwner() ? GameObject->GetOwner()->GetActorNameOrLabel() : GameObject->GetName();
+					}
+					const ImVec4 ObjectColor = Event || GameObject ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+					ImGui::TextColored(ObjectColor, TCHAR_TO_ANSI(*GameObjectName));
+				}
+
+				ImGui::EndTable();
+			}
+
+			ImGui::End();
+		}
+	}
+
+	ImGui::Spacing();
+}
+
+void UWDAudioDebugger::EventPosted(UAkAudioEvent* Event, UAkGameObject* GameObject)
+{
+	const UWorld* World = GetWorld();
+	const double WorldTime = World ? World->GetTimeSeconds() : -1.0;
+	
+	Last100PostedEvents.Add({ WorldTime, Event, GameObject });
+	if (Last100PostedEvents.Num() > 100)
+	{
+		Last100PostedEvents.RemoveAt(0);
 	}
 }
 

@@ -11,6 +11,8 @@
 #include "WDAudioDebugger.generated.h"
 
 class UAkComponent;
+class UAkAudioEvent;
+class UAkGameObject;
 class UAkStateValue;
 
 USTRUCT(BlueprintType)
@@ -26,6 +28,16 @@ struct WIDHID_API FWDAudioDebugMixState
 
 	bool bMuted = false;
 	bool bSoloed = false;
+};
+
+USTRUCT()
+struct WIDHID_API FWDAudioDebugEventInformation
+{
+	GENERATED_BODY()
+	
+	double WorldTimePosted = 0.0;
+	UAkAudioEvent* Event = nullptr;
+	UAkGameObject* GameObject = nullptr;
 };
 
 UCLASS()
@@ -70,9 +82,15 @@ private:
 	// Character Animation Debugger
 	void DrawCharacterAnimationDebugger();
 
+public:
+	// Event Profiler
+	void DrawRecentlyPostedEvents();
+	void EventPosted(UAkAudioEvent* Event, UAkGameObject* GameObject);
+	bool bDisplayingEventWindow = false;
+
 #endif // UE_BUILD_SHIPPING
 
-	// This must be placed outside of UE_BUILD_SHIPPING.
+	// These must be placed outside of UE_BUILD_SHIPPING.
 	// Unreal throws compilation errors when UPROPERTYs are wrapped with most macros.
 	// WITH_EDITORONLY_DATA is one of the few exceptions.
 private:
@@ -80,4 +98,7 @@ private:
 	
 	UPROPERTY(Transient)
 	TArray<FWDAudioDebugMixState> MixStates;
+
+	UPROPERTY(Transient)
+	TArray<FWDAudioDebugEventInformation> Last100PostedEvents;
 };

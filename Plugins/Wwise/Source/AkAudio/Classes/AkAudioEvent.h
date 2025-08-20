@@ -22,6 +22,9 @@ Copyright (c) 2025 Audiokinetic Inc.
 #include "Wwise/CookedData/WwiseLocalizedEventCookedData.h"
 #include "Wwise/Loaded/WwiseLoadedEvent.h"
 
+// WIDHID CUSTOM - BEGIN
+#include "Delegates/Delegate.h"
+// WIDHID CUSTOM - END
 #if WITH_EDITORONLY_DATA
 #include "Wwise/Info/WwiseEventInfo.h"
 #endif
@@ -40,6 +43,9 @@ class AKAUDIO_API UAkAudioEvent : public UAkAudioType
 {
 	GENERATED_BODY()
 
+// WIDHID CUSTOM - BEGIN
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnEventPosted, UAkAudioEvent*, UAkGameObject*);
+// WIDHID CUSTOM - END
 	//
 	// Unreal properties
 	//
@@ -403,5 +409,9 @@ private:
 	void LoadEventData();
 	void UnloadEventData(bool bAsync);
 	FWwiseLoadedEventPtrAtomic LoadedEvent{nullptr};
+// WIDHID CUSTOM - BEGIN
+public:
+	static FOnEventPosted OnEventPosted;
+// WIDHID CUSTOM - END
 };
 

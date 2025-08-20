@@ -47,6 +47,9 @@ Copyright (c) 2025 Audiokinetic Inc.
 #include "Wwise/WwiseResourceCooker.h"
 #endif
 
+// WIDHID CUSTOM - BEGIN
+	UAkAudioEvent::FOnEventPosted UAkAudioEvent::OnEventPosted;
+// WIDHID CUSTOM - END
 int32 UAkAudioEvent::PostOnActor(const AActor* Actor, const FOnAkPostEventCallback& Delegate, const int32 CallbackMask,
                                  const bool bStopWhenAttachedObjectDestroyed)
 {
@@ -434,6 +437,14 @@ AkPlayingID UAkAudioEvent::PostOnGameObject(UAkGameObject* GameObject, const FOn
 	if (PlayingID != AK_INVALID_PLAYING_ID)
 	{
 		GameObject->EventPosted();
+// WIDHID CUSTOM - BEGIN
+#if !UE_BUILD_SHIPPING
+		if (OnEventPosted.IsBound())
+		{
+			OnEventPosted.Broadcast(this, GameObject);
+		}
+#endif
+// WIDHID CUSTOM - END
 	}
 	return PlayingID;
 }
