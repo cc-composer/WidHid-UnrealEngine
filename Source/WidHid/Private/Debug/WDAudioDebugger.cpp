@@ -18,6 +18,9 @@
 #include "Wwise/API/WwiseSoundEngineAPI.h"
 #include "Wwise/API/WwiseSpatialAudioAPI.h"
 
+// A few helper functions, as well as a CVAR to activate the debugger from the console.
+#pragma region Helper
+
 namespace WDAudioDebugger
 {
 	constexpr bool bAudioDebuggerVisible = false;
@@ -67,20 +70,16 @@ namespace WDAudioDebugger
 	}
 }
 
+#pragma endregion
+
+#pragma region Overrides
+
 void UWDAudioDebugger::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	
 	FImGuiModule& ImGuiModule = FImGuiModule::Get();
 	ImGuiDelegateHandle = ImGuiModule.AddWorldImGuiDelegate(GetWorld(), FImGuiDelegate::CreateUObject(this, &ThisClass::Update));
-}
-
-void UWDAudioDebugger::Deinitialize()
-{
-	ImGuiDelegateHandle.Reset();
-	UAkAudioEvent::OnEventPosted.RemoveAll(this);
-
-	Super::Deinitialize();
 }
 
 void UWDAudioDebugger::OnWorldBeginPlay(UWorld& InWorld)
@@ -96,6 +95,21 @@ void UWDAudioDebugger::OnWorldBeginPlay(UWorld& InWorld)
 
 	UAkAudioEvent::OnEventPosted.AddUObject(this, &ThisClass::EventPosted);
 }
+
+void UWDAudioDebugger::Deinitialize()
+{
+	ImGuiDelegateHandle.Reset();
+	UAkAudioEvent::OnEventPosted.RemoveAll(this);
+
+	for (const FWDAudioDebugMixState& MixState : MixStates)
+	{
+		UAkGameplayStatics::SetState(MixState.NeutralState);
+	}
+
+	Super::Deinitialize();
+}
+
+#pragma endregion
 
 void UWDAudioDebugger::Update()
 {
@@ -129,9 +143,10 @@ void UWDAudioDebugger::Update()
 	}
 }
 
+#pragma region Ambient Emitter Debugger
+
 void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 {
-	// TODO: Cleanup
 	if (ImGui::CollapsingHeader("Ambient Emitter Debugger"))
 	{
 		// Ambient emitters should be refreshed every so often since they could be spawning/despawning from the world.
@@ -210,68 +225,51 @@ void UWDAudioDebugger::DrawAmbientEmitterDebugger()
 			ImGui::TableSetColumnIndex(2);
 			ImGui::Text("%d", static_cast<int>(WDAudioDebugger::GetDistanceFromListener(Location)));
 
-			// Obstruction and Occlusion
-			const AkGameObjectID EmitterID = Emitter->GetAkGameObjectID();
-			AkGameObjectID ListenerID = 0;
-			if (FAkAudioDevice* AudioDevice = FAkAudioDevice::Get())
-			{
-				if (const UAkComponent* Listener = AudioDevice->GetSpatialAudioListener())
-				{
-					ListenerID = Listener->GetAkGameObjectID();
-				}
-			}
-
-			AkReal32 ObstructionLevel = 0.0f;
-			AkReal32 OcclusionLevel = 0.0f;
-			if (const IWwiseSoundEngineAPI* SoundEngine = IWwiseSoundEngineAPI::Get())
-			{
-				if (SoundEngine->Query)
-				{					
-					SoundEngine->Query->GetObjectObstructionAndOcclusion(EmitterID, ListenerID, ObstructionLevel, OcclusionLevel);
-				}
-			}
-
+			// Obstruction, Occlusion, Diffraction, and Transmission
+			const FAkAudioDevice* AudioDevice = FAkAudioDevice::Get();
+			const UAkComponent* Listener = AudioDevice ? AudioDevice->GetSpatialAudioListener() : nullptr;
+			const FWDAudioObstructionData Data = FWDAudioObstructionData::Calculate(Emitter, Listener);
+			
 			ImGui::TableSetColumnIndex(3);
-			ImGui::Text("%d", static_cast<int>(ObstructionLevel * 100.0f));
+			ImGui::Text("%d", static_cast<int>(Data.Obstruction * 100.0f));
 			ImGui::TableSetColumnIndex(4);
-			ImGui::Text("%d", static_cast<int>(OcclusionLevel * 100.0f));
-
-			// Diffraction and Transmission
-			AkReal32 DiffractionLevel = 0.0f;
-			AkReal32 TransmissionLevel = 0.0f;
-			if (IWwiseSpatialAudioAPI* SpatialAudio = IWwiseSpatialAudioAPI::Get())
-			{
-				AkVector64 ListenerPosition(0.0, 0.0, 0.0);
-				AkVector64 EmitterPosition(0.0, 0.0, 0.0);
-				AkDiffractionPathInfo DiffractionPathInfo[3];
-				AkUInt32 ArraySize = 3;
-				
-				SpatialAudio->QueryDiffractionPaths(EmitterID, 0 /* PositionIndex */, ListenerPosition, EmitterPosition, DiffractionPathInfo, ArraySize);
-
-				// The first path is the direct path from the emitter to the listener, defining the "transmission loss" in all of the geometry it passes through.
-				// As long as there is no line of sight between the emitter and the listener, the second path is the shortest path through Acoustic Portals from
-				// the emitter to the listener, defining the smallest viable "diffraction".
-				if (ArraySize >= 2)
-				{
-					// 100%+ diffraction paths are always discarded since those are considered to be out of audible range.
-					if (DiffractionPathInfo[1].diffraction < 1.0f)
-					{
-						DiffractionLevel = DiffractionPathInfo[1].diffraction * 100.0f;
-					}
-
-					TransmissionLevel = DiffractionPathInfo[0].transmissionLoss * 100.0f;
-				}
-			}
-
+			ImGui::Text("%d", static_cast<int>(Data.Occlusion * 100.0f));
 			ImGui::TableSetColumnIndex(5);
-			ImGui::Text("%d", static_cast<int>(DiffractionLevel * 100.0f));
+			ImGui::Text("%d", static_cast<int>(Data.Diffraction * 100.0f));
 			ImGui::TableSetColumnIndex(6);
-			ImGui::Text("%d", static_cast<int>(TransmissionLevel * 100.0f));
+			ImGui::Text("%d", static_cast<int>(Data.Transmission * 100.0f));
 		}
 
 		ImGui::EndTable();
 	}
 }
+
+void UWDAudioDebugger::PopulateAmbientEmitters()
+{
+	// Empty the array, but keep the slack. It's to be expected that at least a grand majority of the elements being emptied will be refilled.
+	// Especially since we're already consistently doing cleanup in DrawAmbientEmitterDebugger().
+	AmbientEmitters.Empty(AmbientEmitters.GetSlack());
+
+	const UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	for (TActorIterator<AAkAmbientSound> Itr(World); Itr; ++Itr)
+	{
+		if (const AAkAmbientSound* AmbientSound = *Itr)
+		{
+			AmbientEmitters.Add(AmbientSound->AkComponent);
+		}
+	}
+
+	LastTimeAmbientEmittersRefreshed = World->GetTimeSeconds();
+}
+
+#pragma endregion
+
+#pragma region Mix States
 
 void UWDAudioDebugger::DrawMixStates()
 {
@@ -344,6 +342,7 @@ void UWDAudioDebugger::PostSoloed(FWDAudioDebugMixState& MixState)
 		if (OtherMixState.bSoloed)
 		{
 			bAnotherStateSoloed = true;
+			continue;
 		}
 
 		OtherMixState.bMuted = MixState.bSoloed;
@@ -382,6 +381,10 @@ void UWDAudioDebugger::PostMuted(FWDAudioDebugMixState& MixState)
 	}
 }
 
+#pragma endregion
+
+#pragma region Character Animation
+
 void UWDAudioDebugger::DrawCharacterAnimationDebugger()
 {
 	// This isn't specific to audio, so can be used in a more general debugger, but it is very useful for systems that use a lot of audio animation notifies. 
@@ -396,90 +399,94 @@ void UWDAudioDebugger::DrawCharacterAnimationDebugger()
 			ImGui::TableSetupColumn("Weight");
 			ImGui::TableHeadersRow();
 
-			if (const ACharacter* LocalCharacter = UWDAudioStatics::GetLocallyViewedPawn(this))
+			const ACharacter* LocalCharacter = UWDAudioStatics::GetLocallyViewedPawn(this);
+			if (!LocalCharacter)
 			{
-				if (const USkeletalMeshComponent* Mesh = LocalCharacter->GetMesh())
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No valid viewed pawn.");
+				return;
+			}
+
+			const USkeletalMeshComponent* Mesh = LocalCharacter->GetMesh();
+			if (!Mesh)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Cannot find a valid skeletal mesh for %s.", TCHAR_TO_ANSI(*LocalCharacter->GetActorNameOrLabel()));
+				return;
+			}
+
+			UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+			if (!AnimInstance)
+			{
+				ImGui::TableNextRow();
+				ImGui::TableNextColumn();
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "No valid animation instance for %s's skeletal mesh.", TCHAR_TO_ANSI(*LocalCharacter->GetActorNameOrLabel()));
+				return;
+			}
+
+			// Animations from an active blendspace.
+			const FAnimInstanceProxy::FSyncGroupMap& SyncGroupMap = AnimInstance->GetSyncGroupMapRead();
+			const ANSICHAR* AnimInstanceName = TCHAR_TO_ANSI(*AnimInstance->GetName());
+			for (const TTuple<FName, FAnimGroupInstance>& SyncGroupPair : SyncGroupMap)
+			{
+				for (const FAnimTickRecord& Record : SyncGroupPair.Value.ActivePlayers)
 				{
-					if (UAnimInstance* AnimInstance = Mesh->GetAnimInstance())
+					if (!Record.bIsExclusiveLeader && Record.EffectiveBlendWeight > 0.0f)
 					{
-						const FAnimInstanceProxy::FSyncGroupMap& SyncGroupMap = AnimInstance->GetSyncGroupMapRead();
-						const TArray<FAnimTickRecord>& UngroupedActivePlayers = AnimInstance->GetUngroupedActivePlayersRead();
-
-						// Animations from an active blendspace.
-						const ANSICHAR* AnimInstanceName = TCHAR_TO_ANSI(*AnimInstance->GetName());
-						for (const TTuple<FName, FAnimGroupInstance>& SyncGroupPair : SyncGroupMap)
-						{
-							for (const FAnimTickRecord& Record : SyncGroupPair.Value.ActivePlayers)
-							{
-								if (!Record.bIsExclusiveLeader && Record.EffectiveBlendWeight > 0.0f)
-								{
-									ImGui::TableNextRow();
-									ImGui::TableNextColumn();
-
-									// Animation Instance
-									ImGui::Text(AnimInstanceName);
-									ImGui::TableNextColumn();
-
-									// Animation
-									ImGui::Text(TCHAR_TO_ANSI(*Record.SourceAsset->GetName()));
-									ImGui::TableNextColumn();
-
-									// Weight
-									ImGui::Text("%f", Record.EffectiveBlendWeight * 100.0f);
-								}
-							}
-						}
-
-						// Individual animations
-						for (const FAnimTickRecord& Record : UngroupedActivePlayers)
-						{
-							if (Record.EffectiveBlendWeight > 0.0f)
-							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-
-								// Animation Instance
-								ImGui::Text(AnimInstanceName);
-								ImGui::TableNextColumn();
-
-								// Animation
-								ImGui::Text(TCHAR_TO_ANSI(*Record.SourceAsset->GetName()));
-								ImGui::TableNextColumn();
-
-								// Weight
-								ImGui::Text("%f", Record.EffectiveBlendWeight * 100.0f);
-							}
-						}
-
-						// Basic animation montages
-						for (const FAnimMontageInstance* MontageInstance : AnimInstance->MontageInstances)
-						{
-							if (MontageInstance && MontageInstance->Montage)
-							{
-								ImGui::TableNextRow();
-								ImGui::TableNextColumn();
-
-								// Animation Instance
-								ImGui::Text(AnimInstanceName);
-								ImGui::TableNextColumn();
-
-								// Animation
-								ImGui::Text(TCHAR_TO_ANSI(*MontageInstance->Montage->GetName()));
-								ImGui::TableNextColumn();
-
-								// Weight
-								ImGui::Text("%f", MontageInstance->GetWeight() * 100.0f);
-							}
-						}
+						const ANSICHAR* AnimationName = TCHAR_TO_ANSI(*Record.SourceAsset->GetName());
+						const float Weight = Record.EffectiveBlendWeight * 100.0f;
+						DrawAnimationData(AnimInstanceName, AnimationName, Weight);
 					}
 				}
+			}
 
+			// Individual animations
+			const TArray<FAnimTickRecord>& UngroupedActivePlayers = AnimInstance->GetUngroupedActivePlayersRead();
+			for (const FAnimTickRecord& Record : UngroupedActivePlayers)
+			{
+				if (Record.EffectiveBlendWeight > 0.0f)
+				{
+					const ANSICHAR* AnimationName = TCHAR_TO_ANSI(*Record.SourceAsset->GetName());
+					const float Weight = Record.EffectiveBlendWeight * 100.0f;
+					DrawAnimationData(AnimInstanceName, AnimationName, Weight);
+				}
+			}
+
+			// Basic animation montages
+			for (const FAnimMontageInstance* MontageInstance : AnimInstance->MontageInstances)
+			{
+				if (MontageInstance && MontageInstance->Montage)
+				{
+					const ANSICHAR* AnimationName = TCHAR_TO_ANSI(*MontageInstance->Montage->GetName());
+					const float Weight = MontageInstance->GetWeight() * 100.0f;
+					DrawAnimationData(AnimInstanceName, AnimationName, Weight);
+				}
 			}
 
 			ImGui::EndTable();
 		}
 	}
 }
+
+void UWDAudioDebugger::DrawAnimationData(const ANSICHAR* AnimationInstanceName, const ANSICHAR* AnimationName, const float AnimationWeight)
+{
+	ImGui::TableNextRow();
+	ImGui::TableNextColumn();
+
+	ImGui::Text(AnimationInstanceName);
+	ImGui::TableNextColumn();
+
+	ImGui::Text(AnimationName);
+	ImGui::TableNextColumn();
+
+	ImGui::Text("%f", AnimationWeight);
+}
+
+#pragma endregion
+
+#pragma region Event Tracker
 
 void UWDAudioDebugger::DrawRecentlyPostedEvents()
 {
@@ -548,26 +555,6 @@ void UWDAudioDebugger::EventPosted(UAkAudioEvent* Event, UAkGameObject* GameObje
 	}
 }
 
-void UWDAudioDebugger::PopulateAmbientEmitters()
-{
-	// Empty the array, but keep the slack. It's to be expected that at least a grand majority of the elements being emptied will be refilled.
-	// Especially since we're already consistently doing cleanup in DrawAmbientEmitterDebugger().
-	AmbientEmitters.Empty(AmbientEmitters.GetSlack());
-	
-	const UWorld* World = GetWorld();
-	if (!World)
-	{
-		return;
-	}
-	
-	for (TActorIterator<AAkAmbientSound> Itr(World); Itr; ++Itr)
-	{
-		if (const AAkAmbientSound* AmbientSound = *Itr)
-		{
-			AmbientEmitters.Add(AmbientSound->AkComponent);
-		}
-	}
+#pragma endregion
 
-	LastTimeAmbientEmittersRefreshed = World->GetTimeSeconds();
-}
 #endif // !UE_BUILD_SHIPPING

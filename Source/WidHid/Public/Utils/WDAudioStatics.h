@@ -6,9 +6,18 @@
 
 #include "WDAudioStatics.generated.h"
 
-/**
- * 
- */
+class UAkComponent;
+
+struct FWDAudioObstructionData
+{
+	float Obstruction = 0.0f;
+	float Occlusion = 0.0f;
+	float Diffraction = 0.0f;
+	float Transmission = 0.0f;
+
+	static FWDAudioObstructionData Calculate(const UAkComponent* Emitter, const UAkComponent* Listener);
+};
+
 UCLASS()
 class WIDHID_API UWDAudioStatics : public UBlueprintFunctionLibrary
 {

@@ -40,6 +40,13 @@ struct WIDHID_API FWDAudioDebugEventInformation
 	UAkGameObject* GameObject = nullptr;
 };
 
+/**
+ * ImGui audio debugger that shares details of current ambient emitters, character animations, and an ordered-list of events that have been posted.
+ * Gives the ability to display visual objects of ambient emitters as well as setting soloed/muted mix states.
+ * 
+ * In order to activate, use the wd.AudioDebuggerVisible 1 console command.
+ * You can use Ctrl + ` to gain mouse control in order to interact with the interface.
+ */
 UCLASS()
 class WIDHID_API UWDAudioDebugger : public UWorldSubsystem
 {
@@ -81,6 +88,7 @@ private:
 private:
 	// Character Animation Debugger
 	void DrawCharacterAnimationDebugger();
+	void DrawAnimationData(const ANSICHAR* AnimationInstanceName, const ANSICHAR* AnimationName, const float AnimationWeight);
 
 public:
 	// Event Profiler
