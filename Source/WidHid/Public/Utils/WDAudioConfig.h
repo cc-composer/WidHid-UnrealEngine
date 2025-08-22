@@ -7,6 +7,7 @@
 #include "WDAudioConfig.generated.h"
 
 struct FWDAudioDebugMixState;
+struct FWDQueueAudio;
 
 UCLASS(Config = "WidHid Audio", DefaultConfig)
 class WIDHID_API UWDAudioConfig : public UDeveloperSettings
@@ -16,6 +17,11 @@ class WIDHID_API UWDAudioConfig : public UDeveloperSettings
 public:
 	virtual FName GetCategoryName() const override { return TEXT("Project"); }
 
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(EditDefaultsOnly, Config, Category = "Debug")
 	TArray<FWDAudioDebugMixState> MixStates;
+
+	UPROPERTY(EditDefaultsOnly, Config, Category = "Debug")
+	TArray<FWDQueueAudio> AudioTestQueue;
+#endif
 };
