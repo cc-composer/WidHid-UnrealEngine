@@ -1,4 +1,5 @@
 # Audio Debugger
+![Audio Debugger](https://github.com/user-attachments/assets/68faf373-24ed-43ec-8353-14e7d61e182d)
 
 ## Features
 
