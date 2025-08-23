@@ -39,6 +39,35 @@
 								</CustomStateList>
 							</StateInfo>
 						</Bus>
+						<Bus Name="UI" ID="{C9F9F40A-5F4B-4B5D-9786-794B8B94E352}">
+							<PropertyList>
+								<Property Name="BusChannelConfig" Type="int32">
+									<ValueList>
+										<Value>3840</Value>
+									</ValueList>
+								</Property>
+								<Property Name="Color" Type="int16" Value="14"/>
+								<Property Name="OverrideColor" Type="bool" Value="True"/>
+							</PropertyList>
+							<StateInfo>
+								<StateGroupList>
+									<StateGroupInfo>
+										<StateGroupRef Name="UI" ID="{805824BD-37BB-4F1D-AA8C-9688DCA0DDD7}"/>
+									</StateGroupInfo>
+								</StateGroupList>
+								<CustomStateList>
+									<CustomState>
+										<StateRef Name="Muted" ID="{7330B735-048F-42CF-813B-A32817F77621}"/>
+										<CustomState Name="" ID="{1DE1C26E-8CAC-4D03-A000-F45482C69643}" ShortID="355283515">
+											<PropertyList>
+												<Property Name="BusVolume" Type="Real64" Value="-108"/>
+												<Property Name="Volume" Type="Real64" Value="-108"/>
+											</PropertyList>
+										</CustomState>
+									</CustomState>
+								</CustomStateList>
+							</StateInfo>
+						</Bus>
 					</ChildrenList>
 				</Bus>
 			</ChildrenList>

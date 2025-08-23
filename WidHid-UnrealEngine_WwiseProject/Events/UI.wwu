@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{70D8B044-E28A-42E8-900F-879590543D19}" SchemaVersion="123" RootDocumentID="{F6FAC809-EB17-42CD-BD76-E57408BADBA9}" ParentDocumentID="{F6FAC809-EB17-42CD-BD76-E57408BADBA9}">
+	<Events>
+		<WorkUnit Name="UI" ID="{70D8B044-E28A-42E8-900F-879590543D19}" OwnerID="{F6FAC809-EB17-42CD-BD76-E57408BADBA9}" PersistMode="Nested">
+			<PropertyList>
+				<Property Name="Color" Type="int16" Value="14"/>
+				<Property Name="OverrideColor" Type="bool" Value="True"/>
+			</PropertyList>
+			<ChildrenList>
+				<Event Name="play_ui_electronic_click_4" ID="{492C9C41-578A-4237-BCC9-0621CC030E67}">
+					<ChildrenList>
+						<Action Name="" ID="{911D4186-168F-44A8-9B07-7B8F35C9133D}" ShortID="598573368">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ui_electronic_click_4" ID="{16452204-0085-47F8-8EF7-CAF7C0440DCF}" WorkUnitID="{2F2D9E34-4056-4320-9556-44B785D170AB}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_ui_electronic_click_3" ID="{E6610C8B-55D2-4D29-823C-41D0CFAF4B74}">
+					<ChildrenList>
+						<Action Name="" ID="{935B1310-EA9F-41CD-9AD1-4AF6ED4FAD68}" ShortID="31513406">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ui_electronic_click_3" ID="{6D0D81F5-DEFC-4E45-83CD-8162FEDD000A}" WorkUnitID="{2F2D9E34-4056-4320-9556-44B785D170AB}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_ui_electronic_click_2" ID="{3AABDF33-F653-4756-8F60-93747090943A}">
+					<ChildrenList>
+						<Action Name="" ID="{78424A07-29E3-4261-8BA7-D97D70CC750E}" ShortID="261476108">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ui_electronic_click_2" ID="{FFA14DD7-8885-4CFA-93E5-98671B86BB6C}" WorkUnitID="{2F2D9E34-4056-4320-9556-44B785D170AB}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="play_ui_electronic_click_1" ID="{83C8A862-0E75-4ACA-B8F4-D9C042E5BE52}">
+					<ChildrenList>
+						<Action Name="" ID="{0FC61ABB-5C2C-48B8-BCA2-140E36E9B6FF}" ShortID="790182023">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="ui_electronic_click_1" ID="{786913C9-3F2C-40E3-B934-4494DA0D623A}" WorkUnitID="{2F2D9E34-4056-4320-9556-44B785D170AB}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>

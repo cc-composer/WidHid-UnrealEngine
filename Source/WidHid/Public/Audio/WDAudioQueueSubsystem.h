@@ -45,7 +45,9 @@ protected:
 	bool CanBeDequeued(const FWDQueueAudio& QueueAudio) const;
 
 private:
+	// This value needs extra thread safety since it is accessed by both the game and audio thread.
 	std::atomic<double> NextAllowedPlayTime = 0.0;
+	
 	TArray<FWDQueueAudio> Queue;
 
 	FTimerHandle QueueTimerHandle;

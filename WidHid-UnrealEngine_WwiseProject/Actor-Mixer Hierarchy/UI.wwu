@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{2F2D9E34-4056-4320-9556-44B785D170AB}" SchemaVersion="123" RootDocumentID="{6C16C410-68C1-4F34-AB87-72AA04C31CDB}" ParentDocumentID="{6C16C410-68C1-4F34-AB87-72AA04C31CDB}">
+	<AudioObjects>
+		<WorkUnit Name="UI" ID="{2F2D9E34-4056-4320-9556-44B785D170AB}" OwnerID="{6C16C410-68C1-4F34-AB87-72AA04C31CDB}" PersistMode="Nested">
+			<PropertyList>
+				<Property Name="Color" Type="int16" Value="14"/>
+				<Property Name="OverrideColor" Type="bool" Value="True"/>
+			</PropertyList>
+			<ChildrenList>
+				<ActorMixer Name="UI" ID="{371B6E96-CCF5-4346-B239-82BF6D4230B2}" ShortID="338442726">
+					<PropertyList>
+						<Property Name="EnableAttenuation" Type="bool" Value="False"/>
+					</PropertyList>
+					<ReferenceList>
+						<Reference Name="Conversion">
+							<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+						</Reference>
+						<Reference Name="OutputBus">
+							<ObjectRef Name="UI" ID="{C9F9F40A-5F4B-4B5D-9786-794B8B94E352}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+						</Reference>
+					</ReferenceList>
+					<ChildrenList>
+						<Folder Name="Electronic" ID="{609D1833-4E55-4BF6-8BED-BF3FCB3C07B8}" ShortID="780857252">
+							<ChildrenList>
+								<Sound Name="ui_electronic_click_1" ID="{786913C9-3F2C-40E3-B934-4494DA0D623A}" ShortID="800122827">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Access_Denied_High_DDM16" ID="{43B13387-ADF1-4C6C-A999-263048347246}">
+											<Language>SFX</Language>
+											<AudioFile>UI\Electronic\Access_Denied_High_DDM16.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="317396548"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Access_Denied_High_DDM16" ID="{43B13387-ADF1-4C6C-A999-263048347246}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="ui_electronic_click_2" ID="{FFA14DD7-8885-4CFA-93E5-98671B86BB6C}" ShortID="689542609">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Bleeps_Blops_Clicks_DDM29" ID="{6780D0FD-7F22-4035-AD99-904FAE7AA03C}">
+											<Language>SFX</Language>
+											<AudioFile>UI\Electronic\Bleeps_Blops_Clicks_DDM29.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="870729261"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Bleeps_Blops_Clicks_DDM29" ID="{6780D0FD-7F22-4035-AD99-904FAE7AA03C}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="ui_electronic_click_3" ID="{6D0D81F5-DEFC-4E45-83CD-8162FEDD000A}" ShortID="1062398595">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Transitions_Low_DDM16" ID="{62C7ECF9-5C25-4DE4-8EC0-52EA0C4B0398}">
+											<Language>SFX</Language>
+											<AudioFile>UI\Electronic\Transitions_Low_DDM16.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="452654756"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Transitions_Low_DDM16" ID="{62C7ECF9-5C25-4DE4-8EC0-52EA0C4B0398}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+								<Sound Name="ui_electronic_click_4" ID="{16452204-0085-47F8-8EF7-CAF7C0440DCF}" ShortID="633885245">
+									<ReferenceList>
+										<Reference Name="Conversion">
+											<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{F345E8A7-8EA4-4958-92BE-A9BF648E4220}"/>
+										</Reference>
+										<Reference Name="OutputBus">
+											<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{E7536176-90B8-49BF-9387-0C0FB7500202}"/>
+										</Reference>
+									</ReferenceList>
+									<ChildrenList>
+										<AudioFileSource Name="Various_UI_DDM13" ID="{3997E331-BA2E-47B9-B3FB-39326908300A}">
+											<Language>SFX</Language>
+											<AudioFile>UI\Electronic\Various_UI_DDM13.wav</AudioFile>
+											<MediaIDList>
+												<MediaID ID="122991701"/>
+											</MediaIDList>
+										</AudioFileSource>
+									</ChildrenList>
+									<ActiveSourceList>
+										<ActiveSource Name="Various_UI_DDM13" ID="{3997E331-BA2E-47B9-B3FB-39326908300A}" Platform="Linked"/>
+									</ActiveSourceList>
+								</Sound>
+							</ChildrenList>
+						</Folder>
+					</ChildrenList>
+				</ActorMixer>
+			</ChildrenList>
+		</WorkUnit>
+	</AudioObjects>
+</WwiseDocument>

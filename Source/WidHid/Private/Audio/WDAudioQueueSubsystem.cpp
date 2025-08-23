@@ -40,6 +40,7 @@ namespace WDAudioQueueSubsystem
 
 static void EndOfEventCallback(AkCallbackType Type, AkCallbackInfo* CallbackInfo)
 {
+	// Be careful in this function. We are in the AK event manager thread here, not the game thread.
 	if (Type == AkCallbackType::AK_EndOfEvent)
 	{
 		if (!CallbackInfo)
@@ -88,25 +89,23 @@ void UWDAudioQueueSubsystem::DequeueNext()
 	}
 	
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
-	if (CurrentTime < GetNextAllowedPlayTime() + TimeBetweenQueuedAudio)
+	if (CurrentTime >= GetNextAllowedPlayTime() + TimeBetweenQueuedAudio)
 	{
-		return;
-	}
-	
-	for (auto Itr = Queue.CreateIterator(); Itr; ++Itr)
-	{
-		const FWDQueueAudio QueueAudio = *Itr;
-
-		// This is to taste on whether you want invalid elements to remain in the queue.
-		// Depends on the implementation.
-		Itr.RemoveCurrent();
-		if (CanBeDequeued(QueueAudio))
+		for (auto Itr = Queue.CreateIterator(); Itr; ++Itr)
 		{
-			Play(QueueAudio);
-			break;
-		}
+			const FWDQueueAudio QueueAudio = *Itr;
 
-		// Iterator is invalidated, don't reference it beyond here.
+			// This is to taste on whether you want invalid elements to remain in the queue.
+			// Depends on the implementation.
+			Itr.RemoveCurrent();
+			if (CanBeDequeued(QueueAudio))
+			{
+				Play(QueueAudio);
+				break;
+			}
+
+			// Iterator is invalidated, don't reference it beyond here.
+		}
 	}
 }
 
@@ -120,7 +119,8 @@ void UWDAudioQueueSubsystem::Play(const FWDQueueAudio& QueueAudio)
 		{
 			// The maximum duration isn't necessarily going to be the actual length of the sound due to things like random containers.
 			// The play time will be updated to a more appropriate value during EndOfEventCallback()
-			SetNextAllowedPlayTime(AudioEvent->MaximumDuration);
+			const double CurrentTime = GetWorld()->GetTimeSeconds();
+			SetNextAllowedPlayTime(CurrentTime + AudioEvent->MaximumDuration);
 		}
 	}
 }
