@@ -33,6 +33,11 @@
 									</ReferenceList>
 									<ChildrenList>
 										<AudioFileSource Name="Access_Denied_High_DDM16" ID="{43B13387-ADF1-4C6C-A999-263048347246}">
+											<PropertyList>
+												<Property Name="LoopBegin" Type="Real64" Value="0"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+												<Property Name="TrimEnd" Type="Real64" Value="0.186291467811844"/>
+											</PropertyList>
 											<Language>SFX</Language>
 											<AudioFile>UI\Electronic\Access_Denied_High_DDM16.wav</AudioFile>
 											<MediaIDList>
@@ -55,6 +60,11 @@
 									</ReferenceList>
 									<ChildrenList>
 										<AudioFileSource Name="Bleeps_Blops_Clicks_DDM29" ID="{6780D0FD-7F22-4035-AD99-904FAE7AA03C}">
+											<PropertyList>
+												<Property Name="LoopBegin" Type="Real64" Value="0"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+												<Property Name="TrimEnd" Type="Real64" Value="0.391822166232065"/>
+											</PropertyList>
 											<Language>SFX</Language>
 											<AudioFile>UI\Electronic\Bleeps_Blops_Clicks_DDM29.wav</AudioFile>
 											<MediaIDList>
@@ -77,6 +87,11 @@
 									</ReferenceList>
 									<ChildrenList>
 										<AudioFileSource Name="Transitions_Low_DDM16" ID="{62C7ECF9-5C25-4DE4-8EC0-52EA0C4B0398}">
+											<PropertyList>
+												<Property Name="LoopBegin" Type="Real64" Value="0"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+												<Property Name="TrimEnd" Type="Real64" Value="0.656715556982109"/>
+											</PropertyList>
 											<Language>SFX</Language>
 											<AudioFile>UI\Electronic\Transitions_Low_DDM16.wav</AudioFile>
 											<MediaIDList>
@@ -99,6 +114,11 @@
 									</ReferenceList>
 									<ChildrenList>
 										<AudioFileSource Name="Various_UI_DDM13" ID="{3997E331-BA2E-47B9-B3FB-39326908300A}">
+											<PropertyList>
+												<Property Name="LoopBegin" Type="Real64" Value="0"/>
+												<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+												<Property Name="TrimEnd" Type="Real64" Value="1.23113426975841"/>
+											</PropertyList>
 											<Language>SFX</Language>
 											<AudioFile>UI\Electronic\Various_UI_DDM13.wav</AudioFile>
 											<MediaIDList>

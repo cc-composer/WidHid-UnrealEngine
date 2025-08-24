@@ -10,7 +10,7 @@ static constexpr double TimeBetweenQueuedAudio = 0.5;
 namespace WDAudioQueueSubsystem
 {
 #if !UE_BUILD_SHIPPING
-	FAutoConsoleCommand TestAudioQueueCommand(TEXT("wd.TestAudioQueue"), TEXT("Play a series of sounds from the UWDAudioQueueSubsystem. You may modify the test sounds through the WidHid Audio section of the Project Settings."), FConsoleCommandDelegate::CreateLambda([]
+	FAutoConsoleCommand TestAudioQueueCommand(TEXT("wd.TestAudioQueue"), TEXT("Play a series of sounds from the UWDAudioQueueSubsystem. You may modify the test sounds through the WDAudio Config section of the Project Settings."), FConsoleCommandDelegate::CreateLambda([]
 		{
 			const UWorld* World = GWorld;
 			if (!World)
@@ -40,14 +40,9 @@ namespace WDAudioQueueSubsystem
 
 static void EndOfEventCallback(AkCallbackType Type, AkCallbackInfo* CallbackInfo)
 {
-	// Be careful in this function. We are in the AK event manager thread here, not the game thread.
-	if (Type == AkCallbackType::AK_EndOfEvent)
+	// Be careful in this function. We are in the AK event manager thread here, not the game thread, so we're prone to race conditions.
+	if (Type == AkCallbackType::AK_EndOfEvent && CallbackInfo)
 	{
-		if (!CallbackInfo)
-		{
-			return;
-		}
-
 		if (UWDAudioQueueSubsystem* QueueSubsystem = reinterpret_cast<UWDAudioQueueSubsystem*>(CallbackInfo->pCookie))
 		{
 			if (const UWorld* World = QueueSubsystem->GetWorld())
@@ -76,14 +71,39 @@ void UWDAudioQueueSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-void UWDAudioQueueSubsystem::Enqueue(const FWDQueueAudio& QueueAudio)
+void UWDAudioQueueSubsystem::Enqueue(FWDQueueAudio QueueAudio)
 {
-	Queue.Add(QueueAudio);
+	if (!bQueueOpen)
+	{
+		return;
+	}
+	
+	const double CurrentTime = GetWorld()->GetTimeSeconds();
+	QueueAudio.TimeQueued = CurrentTime;
+	
+	if (Queue.IsEmpty())
+	{
+		Queue.Add(QueueAudio);
+	}
+	else
+	{
+		int32 InsertIndex = Queue.Num();
+		for (int32 i = 0; i < Queue.Num(); ++i)
+		{
+			if (QueueAudio.Priority >= Queue[i].Priority)
+			{
+				InsertIndex = QueueAudio.Priority > Queue[i].Priority ? i : i + 1;
+				break;
+			}
+		}
+
+		Queue.Insert(QueueAudio, InsertIndex);
+	}
 }
 
 void UWDAudioQueueSubsystem::DequeueNext()
 {
-	if (Queue.IsEmpty())
+	if (Queue.IsEmpty() || bQueueFrozen)
 	{
 		return;
 	}
@@ -127,5 +147,16 @@ void UWDAudioQueueSubsystem::Play(const FWDQueueAudio& QueueAudio)
 
 bool UWDAudioQueueSubsystem::CanBeDequeued(const FWDQueueAudio& QueueAudio) const
 {
-	return IsValid(QueueAudio.AudioEvent);
+	if (!QueueAudio.AudioEvent)
+	{
+		return false;
+	}
+
+	if (GetWorld()->TimeSince(QueueAudio.TimeQueued) > QueueAudio.MaxAllowedQueueTime)
+	{
+		// This sound has expired from the queue.
+		return false;
+	}
+
+	return true;
 }
