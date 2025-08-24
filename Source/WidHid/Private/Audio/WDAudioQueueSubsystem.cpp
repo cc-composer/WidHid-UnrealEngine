@@ -3,7 +3,11 @@
 #include "Audio/WDAudioQueueSubsystem.h"
 
 #include "AkAudioEvent.h"
+#include "Logging/StructuredLog.h"
+#include "ProfilingDebugging/CpuProfilerTrace.h"
 #include "Utils/WDAudioConfig.h"
+
+DEFINE_LOG_CATEGORY(LogWDQueue);
 
 static constexpr double TimeBetweenQueuedAudio = 0.5;
 
@@ -49,6 +53,8 @@ static void EndOfEventCallback(AkCallbackType Type, AkCallbackInfo* CallbackInfo
 			{
 				const double Time = World->GetTimeSeconds();
 				QueueSubsystem->SetNextAllowedPlayTime(Time);
+
+				UE_LOGFMT(LogWDQueue, Verbose, "{Function}: Queued sound ended. Next allowed play time set as {Time}", __FUNCTION__, Time);
 			}
 		}
 	}
@@ -77,6 +83,12 @@ void UWDAudioQueueSubsystem::Enqueue(FWDQueueAudio QueueAudio)
 	{
 		return;
 	}
+
+	if (!QueueAudio.AudioEvent)
+	{
+		UE_LOGFMT(LogWDQueue, Error, "{Function}: An invalid event was attempted to be added to the queue.", __FUNCTION__);
+		return;
+	}
 	
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	QueueAudio.TimeQueued = CurrentTime;
@@ -84,6 +96,7 @@ void UWDAudioQueueSubsystem::Enqueue(FWDQueueAudio QueueAudio)
 	if (Queue.IsEmpty())
 	{
 		Queue.Add(QueueAudio);
+		UE_LOGFMT(LogWDQueue, Verbose, "{Function}: {Event} queued at head of queue.", __FUNCTION__, QueueAudio.AudioEvent->GetName());
 	}
 	else
 	{
@@ -98,6 +111,7 @@ void UWDAudioQueueSubsystem::Enqueue(FWDQueueAudio QueueAudio)
 		}
 
 		Queue.Insert(QueueAudio, InsertIndex);
+		UE_LOGFMT(LogWDQueue, Verbose, "{Function}: {Event} queued at index {Index}", __FUNCTION__, QueueAudio.AudioEvent->GetName(), InsertIndex);
 	}
 }
 
@@ -107,6 +121,8 @@ void UWDAudioQueueSubsystem::DequeueNext()
 	{
 		return;
 	}
+
+	TRACE_CPUPROFILER_EVENT_SCOPE_STR(__FUNCTION__);
 	
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	if (CurrentTime >= GetNextAllowedPlayTime() + TimeBetweenQueuedAudio)
@@ -141,6 +157,8 @@ void UWDAudioQueueSubsystem::Play(const FWDQueueAudio& QueueAudio)
 			// The play time will be updated to a more appropriate value during EndOfEventCallback()
 			const double CurrentTime = GetWorld()->GetTimeSeconds();
 			SetNextAllowedPlayTime(CurrentTime + AudioEvent->MaximumDuration);
+
+			UE_LOGFMT(LogWDQueue, Verbose, "{Function}: {Event} played from the queue.", __FUNCTION__, QueueAudio.AudioEvent->GetName());
 		}
 	}
 }
@@ -149,12 +167,13 @@ bool UWDAudioQueueSubsystem::CanBeDequeued(const FWDQueueAudio& QueueAudio) cons
 {
 	if (!QueueAudio.AudioEvent)
 	{
+		UE_LOGFMT(LogWDQueue, Error, "{Function}: An invalid event was attempted to be played from the queue.", __FUNCTION__);
 		return false;
 	}
 
 	if (GetWorld()->TimeSince(QueueAudio.TimeQueued) > QueueAudio.MaxAllowedQueueTime)
 	{
-		// This sound has expired from the queue.
+		UE_LOGFMT(LogWDQueue, Warning, "{Function}: {Event} expired from the queue.", __FUNCTION__, QueueAudio.AudioEvent->GetName());
 		return false;
 	}
 

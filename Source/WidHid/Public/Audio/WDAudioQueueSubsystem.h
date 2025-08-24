@@ -6,6 +6,8 @@
 
 #include "WDAudioQueueSubsystem.generated.h"
 
+WIDHID_API DECLARE_LOG_CATEGORY_EXTERN(LogWDQueue, Display, All);
+
 class UAkAudioEvent;
 
 USTRUCT(BlueprintType)
