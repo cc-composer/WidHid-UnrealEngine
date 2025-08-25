@@ -93,26 +93,18 @@ void UWDAudioQueueSubsystem::Enqueue(FWDQueueAudio QueueAudio)
 	const double CurrentTime = GetWorld()->GetTimeSeconds();
 	QueueAudio.TimeQueued = CurrentTime;
 	
-	if (Queue.IsEmpty())
+	int32 InsertIndex = Queue.Num();
+	for (int32 i = 0; i < Queue.Num(); ++i)
 	{
-		Queue.Add(QueueAudio);
-		UE_LOGFMT(LogWDQueue, Verbose, "{Function}: {Event} queued at head of queue.", __FUNCTION__, QueueAudio.AudioEvent->GetName());
-	}
-	else
-	{
-		int32 InsertIndex = Queue.Num();
-		for (int32 i = 0; i < Queue.Num(); ++i)
+		if (QueueAudio.Priority >= Queue[i].Priority)
 		{
-			if (QueueAudio.Priority >= Queue[i].Priority)
-			{
-				InsertIndex = QueueAudio.Priority > Queue[i].Priority ? i : i + 1;
-				break;
-			}
+			InsertIndex = QueueAudio.Priority > Queue[i].Priority ? i : i + 1;
+			break;
 		}
-
-		Queue.Insert(QueueAudio, InsertIndex);
-		UE_LOGFMT(LogWDQueue, Verbose, "{Function}: {Event} queued at index {Index}", __FUNCTION__, QueueAudio.AudioEvent->GetName(), InsertIndex);
 	}
+
+	Queue.Insert(QueueAudio, InsertIndex);
+	UE_LOGFMT(LogWDQueue, Verbose, "{Function}: {Event} queued at index {Index}", __FUNCTION__, QueueAudio.AudioEvent->GetName(), InsertIndex);
 }
 
 void UWDAudioQueueSubsystem::DequeueNext()
