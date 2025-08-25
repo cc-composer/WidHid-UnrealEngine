@@ -315,6 +315,9 @@ public:
 	 */
 	void UpdateSpatialAudioRoom(FVector Location);
 
+// WIDHID CUSTOM - BEGIN
+	bool IsAutoDestroying() const { return bAutoDestroy; }
+// WIDHID CUSTOM - END
 	void SetAutoDestroy(bool in_AutoDestroy) { bAutoDestroy = in_AutoDestroy; }
 
 	bool UseDefaultListeners() const { return bUseDefaultListeners; }
@@ -346,8 +349,9 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
-
-private:
+// WIDHID CUSTOM - BEGIN - SETTING TO PROTECTED INSTEAD OF PRIVATE
+protected:
+// WIDHID CUSTOM - END
 	/**
 	 * Register the component with Wwise
 	 */
