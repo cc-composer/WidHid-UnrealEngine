@@ -8,3 +8,5 @@ Check out my Youtube Channel as well for my technical sound design tutorial seri
 
 Current Projects
 * Audio Debugger: [here](https://github.com/cc-composer/WidHid-UnrealEngine/tree/main/Source/WidHid/Public/Debug)
+* Audio Obstruction System: [here](https://github.com/cc-composer/WidHid-UnrealEngine/tree/main/Source/WidHid/Public/Audio)
+* Audio Queue System: [here](https://github.com/cc-composer/WidHid-UnrealEngine/tree/main/Source/WidHid/Public/Audio)
