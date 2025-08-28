@@ -19,16 +19,16 @@ struct WIDHID_API FWDQueueAudio
 	FWDQueueAudio(UAkAudioEvent* Audio) : AudioEvent(Audio) {}
 
 	// The sound to be placed in the queue.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<UAkAudioEvent> AudioEvent = nullptr;
 
 	// Higher priority sounds will play from the queue sooner than lower priority sounds.
 	// Sounds with equal priority will play in the order that they entered the queue.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "1", UIMin = "1", ClampMax = "10", UIMax = "10"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "1", UIMin = "1", ClampMax = "10", UIMax = "10"))
 	int32 Priority = 5;
 
 	// Maximum time this sound can remain in the queue until it is ejected.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", UIMin = "0.0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (ClampMin = "0.0", UIMin = "0.0"))
 	float MaxAllowedQueueTime = 5.0f;
 
 public:
